@@ -75,6 +75,7 @@ function login(formEl: FormInstance | undefined) {
   formEl.validate((vaild) => {
     if (vaild) {
       console.log(loginForm.value.account, loginForm.value.password);
+      router.push("/home");
     } else {
       return false;
     }

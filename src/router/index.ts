@@ -13,6 +13,29 @@ const routes: Array<RouteRecordRaw> = [
     path: "/register",
     component: () => import("../views/Register.vue"),
   },
+  {
+    path: "/home",
+    component: () => import("../views/Home.vue"),
+    redirect: "/work",
+    children: [
+      {
+        path: "/work",
+        meta: {
+          isShow: true,
+          title: "工作区",
+        },
+        component: () => import("../views/Work.vue"),
+      },
+      {
+        path: "/table",
+        meta: {
+          isShow: true,
+          title: "表格",
+        },
+        component: () => import("../views/Table.vue"),
+      },
+    ],
+  },
 ];
 
 const router = createRouter({
