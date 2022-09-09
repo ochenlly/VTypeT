@@ -1,6 +1,12 @@
 interface loginData {
-  account: string;
+  username: string;
   password: string;
 }
 
-export type { loginData };
+interface registerData {
+  username: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export type { loginData, registerData };

@@ -10,11 +10,11 @@
           :rules="registerRules"
           class="demo-ruleForm"
         >
-          <el-form-item prop="account">
+          <el-form-item prop="username">
             <el-input
-              v-model="registerForm.account"
+              v-model="registerForm.username"
               placeholder="账号"
-              @focus="hiddenSignonErr('account')"
+              @focus="hiddenSignonErr(username)"
             />
           </el-form-item>
           <el-form-item prop="password">
@@ -22,7 +22,7 @@
               v-model="registerForm.password"
               type="password"
               placeholder="密码"
-              @focus="hiddenSignonErr('password')"
+              @focus="hiddenSignonErr(password)"
             />
           </el-form-item>
           <el-form-item prop="confirmPassword">
@@ -30,15 +30,19 @@
               v-model="registerForm.confirmPassword"
               type="password"
               placeholder="确认密码"
-              @focus="hiddenSignonErr('confirmPassword')"
+              @focus="hiddenSignonErr(confirmPassword)"
             />
           </el-form-item>
-          <el-form-item class="buttons">
-            <el-button type="primary" size="large" @click="signon"
-              >注册</el-button
+          <div class="buttons">
+            <el-button
+              type="primary"
+              size="large"
+              @click="signon"
+              :loading="registerLoading"
+              >{{ registerLoading ? "注册中" : "注册" }}</el-button
             >
             <el-button size="large" @click="backLogin">返回</el-button>
-          </el-form-item>
+          </div>
         </el-form>
       </div>
     </div>
@@ -49,11 +53,17 @@
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { CRegister } from "../pageTs/register";
+import { registerModule } from "../request/api";
+import { ElMessage } from "element-plus";
+const registerLoading = ref<boolean>(false);
+const username: string = "username";
+const password: string = "password";
+const confirmPassword: string = "confirmPassword";
 const router = useRouter();
 const registerRef = ref();
 const registerForm = ref(new CRegister());
 const registerRules = reactive({
-  account: [
+  username: [
     {
       required: true,
       message: "账号不能为空",
@@ -107,10 +117,32 @@ const registerRules = reactive({
 });
 //注册
 function signon() {
-  registerRef.value.validate((vaild: boolean) => {
+  registerRef.value.validate(async (vaild: boolean) => {
     if (vaild) {
-      //发送请求
-      console.log("成功！");
+      try {
+        //发送请求
+        registerLoading.value = true;
+        const res: any = await registerModule({
+          username: registerForm.value.username,
+          password: registerForm.value.password,
+          confirmPassword: registerForm.value.confirmPassword,
+        });
+
+        setTimeout(() => {
+          if (res.message === "注册成功！") {
+            ElMessage({
+              message: "注册成功！",
+              type: "success",
+            });
+            router.push("/login");
+          } else {
+            ElMessage.error(res.message);
+          }
+          registerLoading.value = false;
+        }, 500);
+      } catch (err) {
+        ElMessage.error("错误！");
+      }
     }
     return false;
   });
@@ -167,12 +199,12 @@ function hiddenSignonErr(item: string) {
       }
 
       .buttons {
-        width: 200px;
+        width: 300px;
         margin: 0 auto;
         margin-top: 45px;
 
-        button:nth-child(1) {
-          margin-right: 50px;
+        button:nth-child(2) {
+          margin-left: 50px;
         }
       }
     }

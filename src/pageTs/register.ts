@@ -1,7 +1,7 @@
 import type { IRegister } from "../type";
 
 class CRegister implements IRegister {
-  account: string = "";
+  username: string = "";
   password: string = "";
   confirmPassword: string = "";
 }

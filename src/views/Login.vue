@@ -10,10 +10,10 @@
         <el-form :model="loginForm" :rules="loginRules" ref="loginRef">
           <div class="input-field">
             <div class="input-left">账号</div>
-            <el-form-item placeholder="账号" prop="account">
+            <el-form-item placeholder="账号" prop="username">
               <el-input
-                v-model="loginForm.account"
-                @focus="hiddenLoginErr(loginRef, 'account')"
+                v-model="loginForm.username"
+                @focus="hiddenLoginErr(loginRef, 'username')"
               />
             </el-form-item>
           </div>
@@ -33,8 +33,12 @@
             <el-button type="success" size="large" @click="signon"
               >去注册</el-button
             >
-            <el-button type="primary" size="large" @click="login(loginRef)"
-              >登录</el-button
+            <el-button
+              type="primary"
+              size="large"
+              @click="login(loginRef)"
+              :loading="loginLoading"
+              >{{ loginLoading ? "登陆中" : "登录" }}</el-button
             >
           </div>
         </el-form>
@@ -48,11 +52,14 @@ import { ref, reactive } from "vue";
 import type { FormInstance } from "element-plus";
 import { CLogin } from "../pageTs/login";
 import { useRouter } from "vue-router";
+import { loginModule } from "../request/api";
+import { ElMessage } from "element-plus";
+const loginLoading = ref<boolean>(false);
 const router = useRouter();
 const loginRef = ref<FormInstance>();
 const loginForm = ref(new CLogin());
 const loginRules = reactive({
-  account: {
+  username: {
     required: true,
     message: "请输入账号",
     type: "string",
@@ -72,10 +79,31 @@ function signon() {
 //登录验证
 function login(formEl: FormInstance | undefined) {
   if (!formEl) return;
-  formEl.validate((vaild) => {
+  formEl.validate(async (vaild) => {
     if (vaild) {
-      console.log(loginForm.value.account, loginForm.value.password);
-      router.push("/home");
+      try {
+        loginLoading.value = true;
+        const res: any = await loginModule({
+          username: loginForm.value.username,
+          password: loginForm.value.password,
+        });
+        const message: string = res.message;
+
+        setTimeout(() => {
+          if (message !== "登录成功！") {
+            ElMessage.error(message);
+          } else {
+            router.push("/home");
+            ElMessage({
+              message: "登陆成功！",
+              type: "success",
+            });
+          }
+          loginLoading.value = false;
+        }, 500);
+      } catch (err) {
+        ElMessage.error("错误！");
+      }
     } else {
       return false;
     }

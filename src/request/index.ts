@@ -1,8 +1,9 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { ElMessage } from "element-plus";
 
 //创建实例
 const service: AxiosInstance = axios.create({
-  baseURL: "",
+  baseURL: "http://127.0.0.1:5050",
   timeout: 5000,
 });
 
@@ -24,10 +25,6 @@ service.interceptors.request.use(
 //响应拦截
 service.interceptors.response.use(
   (res: AxiosResponse) => {
-    const code: number = res.data.code;
-    if (code != 200) {
-      return Promise.reject();
-    }
     return res.data;
   },
   (err) => {

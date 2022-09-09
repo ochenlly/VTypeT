@@ -34,6 +34,14 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("../views/Table.vue"),
       },
+      {
+        path: "/form",
+        meta: {
+          isShow: true,
+          title: "表单",
+        },
+        component: () => import("../views/Form.vue"),
+      },
     ],
   },
 ];
